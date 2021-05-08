@@ -182,7 +182,8 @@ class Rotate(albu.Rotate):
                  always_apply=False,
                  p=0.5, ):
         super(Rotate, self).__init__(limit, CV2_INTER[interpolation], CV2_BORDER[border_mode],
-                                     value=value, always_apply=always_apply, p=p)
+                                    #  value=value,
+                                     always_apply=always_apply, p=p)
 
 
 @TRANSFORMS.register_module

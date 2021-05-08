@@ -4,7 +4,7 @@ size = (32, 100)
 mean, std = 0.5, 0.5
 
 sensitive = False
-character = 'abcdefghijklmnopqrstuvwxyz0123456789'
+character = 'अआइईउऊऋऍएऐऑओऔकखगघङचछजझञटठडढणतथदधनपफबभमयरलवशषसहऽॐक़ख़ग़ज़ड़ढ़फ़॰ऍऑऽॐ।॥ँंः़ािीुूृॅेैॉोौ्ॅॉ०१२३४५६७८९'
 batch_max_length = 25
 
 F = 20
@@ -203,54 +203,53 @@ test_dataset_params = dict(
     character=character,
 )
 
-data_root = '../../../../dataset/str/data/data_lmdb_release/'
+data_root = '../dataset/'
 
 ###############################################################################
 # 3. test
 batch_size = 192
 
 # data
-test_root = data_root + 'evaluation/'
-test_folder_names = ['IC15_2077']
+# test_root = data_root + 'evaluation/'
+# test_folder_names = ['IC15_2077']
 # test_folder_names = ['CUTE80', 'IC03_867', 'IC13_1015', 'IC15_2077',
 #                      'IIIT5k_3000', 'SVT', 'SVTP']
-test_dataset = [dict(type='LmdbDataset', root=test_root + f_name,
-                     **test_dataset_params) for f_name in test_folder_names]
+# test_dataset = [dict(type='LmdbDataset', root=test_root + f_name,
+#                      **test_dataset_params) for f_name in test_folder_names]
 
-test = dict(
-    data=dict(
-        dataloader=dict(
-            type='DataLoader',
-            batch_size=batch_size,
-            num_workers=4,
-            shuffle=False,
-        ),
-        dataset=test_dataset,
-        transform=deploy['transform'],
-    ),
-    postprocess_cfg=dict(
-        sensitive=sensitive,
-        character=character,
-    ),
-)
+# test = dict(
+#     data=dict(
+#         dataloader=dict(
+#             type='DataLoader',
+#             batch_size=batch_size,
+#             num_workers=4,
+#             shuffle=False,
+#         ),
+#         dataset=test_dataset,
+#         transform=deploy['transform'],
+#     ),
+#     postprocess_cfg=dict(
+#         sensitive=sensitive,
+#         character=character,
+#     ),
+# )
 
 ###############################################################################
 # 4. train
 
 # work directory
-root_workdir = 'workdir'
+root_workdir = 'workdir'  # save directory
 
 # data
 train_root = data_root + 'training/'
 # MJ dataset
-train_root_mj = train_root + 'MJ/'
-mj_folder_names = ['/MJ_test', 'MJ_valid', 'MJ_train']
+train_root_mj = train_root + 'MJ/MJ_train/'
+# mj_folder_names = ['MJ_train']
 # ST dataset
-train_root_st = train_root + 'ST/'
+# train_root_st = train_root + 'ST/'
 
-train_dataset_mj = [dict(type='LmdbDataset', root=train_root_mj + folder_name)
-                    for folder_name in mj_folder_names]
-train_dataset_st = [dict(type='LmdbDataset', root=train_root_st)]
+train_dataset_mj = dict(type='LmdbDataset', root=train_root_mj)
+# train_dataset_st = [dict(type='LmdbDataset', root=train_root_st)]
 
 # valid
 valid_root = data_root + 'validation/'
@@ -265,8 +264,11 @@ train_transforms = [
     dict(type='ToTensor'),
 ]
 
-max_iterations = 300000
-milestones = [150000, 250000]
+# max_iterations = 300000
+# milestones = [150000, 250000]
+
+max_iterations = 3000
+milestones = [1500, 2500]
 
 train = dict(
     data=dict(
@@ -276,27 +278,29 @@ train = dict(
                 batch_size=batch_size,
                 num_workers=4,
             ),
-            sampler=dict(
-                type='BalanceSampler',
-                batch_size=batch_size,
-                shuffle=True,
-                oversample=True,
-            ),
-            dataset=dict(
-                type='ConcatDatasets',
-                datasets=[
-                    dict(
-                        type='ConcatDatasets',
-                        datasets=train_dataset_mj,
-                    ),
-                    dict(
-                        type='ConcatDatasets',
-                        datasets=train_dataset_st,
-                    )
-                ],
-                batch_ratio=[0.5, 0.5],
-                **dataset_params,
-            ),
+            # sampler=dict(
+            #     type='BalanceSampler',
+            #     batch_size=batch_size,
+            #     shuffle=True,
+            #     oversample=True,
+            # ),
+            dataset=train_dataset_mj,
+            # dict(
+            #     type='ConcatDatasets',
+            #     datasets=[
+            #         dict(
+            #             type='ConcatDatasets',
+            #             datasets=train_dataset_mj,
+            #         )
+            #         ,
+            #         dict(
+            #             type='ConcatDatasets',
+            #             datasets=train_dataset_st,
+            #         )
+            #     ],
+            #     batch_ratio=[0.5, 0.5],
+            #     **dataset_params,
+            # ),
             transform=train_transforms,
         ),
         val=dict(
@@ -315,10 +319,16 @@ train = dict(
     lr_scheduler=dict(type='StepLR',
                       milestones=milestones,
                       ),
+    # max_iterations=max_iterations,
+    # log_interval=10,
+    # trainval_ratio=2000,
+    # snapshot_interval=20000,
+    # save_best=True,
+    # resume=None,
     max_iterations=max_iterations,
     log_interval=10,
-    trainval_ratio=2000,
-    snapshot_interval=20000,
+    trainval_ratio=500,
+    snapshot_interval=200,
     save_best=True,
     resume=None,
 )
