@@ -10,7 +10,12 @@ from ..lr_schedulers import build_lr_scheduler
 from ..optimizers import build_optimizer
 from ..utils import save_checkpoint
 
-
+import wandb
+wandb.init(name='vedastr', 
+           project='vedastr',
+           notes='Scene Text Detection', 
+           tags=['tps_resnet_bilstm_attn','small_satrn'])
+           
 class TrainRunner(InferenceRunner):
     def __init__(self, train_cfg, deploy_cfg, common_cfg=None):
         super(TrainRunner, self).__init__(deploy_cfg, common_cfg)
@@ -87,6 +92,11 @@ class TrainRunner(InferenceRunner):
         self.logger.info('Validate, acc %.4f, edit %s' %
                          (self.metric.avg['acc']['true'], self.metric.avg['edit']))
         self.logger.info(f'\n{self.metric.predict_example_log}')
+        wandb.log({
+                "Epoch": self.epoch,
+                "Iter": self.iter,
+                "Val Acc": self.metric.avg['acc']['true'],
+                "Edit": self.metric.avg['edit']})
 
     def _train_batch(self, img, label):
         self.model.train()
@@ -121,6 +131,13 @@ class TrainRunner(InferenceRunner):
                  self.metric.avg['edit']))
 
             self.logger.info(f'\n{self.metric.predict_example_log}')
+            wandb.log({
+                "Epoch": self.epoch,
+                "Iter": self.iter,
+                "Train Loss": loss.item(),
+                "Train Acc": self.metric.avg['acc']['true'],
+                "Edit": self.metric.avg['edit']})
+
 
     def _validate_batch(self, img, label):
         self.model.eval()

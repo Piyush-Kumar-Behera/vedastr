@@ -267,8 +267,8 @@ train_transforms = [
 # max_iterations = 300000
 # milestones = [150000, 250000]
 
-max_iterations = 3000
-milestones = [1500, 2500]
+max_iterations = 5000
+milestones = [1500, 3500]
 
 train = dict(
     data=dict(
@@ -327,7 +327,7 @@ train = dict(
     # resume=None,
     max_iterations=max_iterations,
     log_interval=10,
-    trainval_ratio=500,
+    trainval_ratio=50,
     snapshot_interval=200,
     save_best=True,
     resume=None,

@@ -269,7 +269,7 @@ train_transforms = [
     dict(type='ToTensor'),
 ]
 
-max_epochs = 50
+max_epochs = 200
 milestones = [2, 4]  # epoch start from 0, so 2 means lr decay at 3 epoch, 4 means lr decay at the end of
 
 train = dict(
@@ -332,7 +332,7 @@ train = dict(
 
     max_epochs=max_epochs,
     log_interval=10,
-    trainval_ratio=500,
+    trainval_ratio=50,
     snapshot_interval=200,
     save_best=True,
     resume=None,
